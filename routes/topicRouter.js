@@ -1,7 +1,8 @@
 const topicRouter = require('express').Router();
-const { sendTopics } = require('../controllers');
+const { sendTopics, addTopic } = require('../controllers');
 
 topicRouter.route('/')
-  .get(sendTopics);
+  .get(sendTopics)
+  .post(addTopic);
 
 module.exports = topicRouter;

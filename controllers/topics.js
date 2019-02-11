@@ -10,8 +10,8 @@ exports.sendTopics = (req, res, next) => {
 
 exports.addTopic = (req, res, next) => {
   insertTopic(req.body)
-    .then((topic) => {
-      res.send({ topic });
+    .then(([topic]) => {
+      res.status(201).send({ topic });
     })
     .catch(console.error);
 };

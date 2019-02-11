@@ -1,9 +1,9 @@
-const { sendTopics, insertTopic } = require('./topics');
+const { sendTopics, addTopic } = require('./topics');
 const {
   sendArticles, insertArticle, sendArticleByID, putArticle, removeArticle, addArticle,
 } = require('./articles');
 
 
 module.exports = {
-  sendTopics, insertTopic, sendArticles, insertArticle, sendArticleByID, putArticle, removeArticle, addArticle,
+  sendTopics, addTopic, sendArticles, insertArticle, sendArticleByID, putArticle, removeArticle, addArticle,
 };

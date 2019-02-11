@@ -12,7 +12,7 @@ exports.sendArticles = (req, res, next) => {
 
 exports.sendArticleByID = (req, res, next) => {
   fetchArticleByID(req.params.article_id)
-    .then((articles) => {
+    .then(([articles]) => {
       res.send({ articles });
     })
     .catch(console.error);
@@ -27,9 +27,9 @@ exports.addArticle = (req, res, next) => {
 };
 
 exports.putArticle = (req, res, next) => {
-  updateArticle(req.body, req.param.article_id)
-    .then((article) => {
-      res.send({ article });
+  updateArticle(req.body, req.params.article_id)
+    .then(([article]) => {
+      res.status(202).send({ article });
     })
     .catch(console.error);
 };
