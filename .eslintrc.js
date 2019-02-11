@@ -15,6 +15,8 @@ module.exports = {
         "arrow-body-style": 0,
         "no-param-reassign": 0,
         "prefer-promise-reject-errors": 0,
+        "object-curly-newline": 0,
+        "max-len": 1,
     }
 
 };
