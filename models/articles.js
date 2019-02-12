@@ -42,12 +42,11 @@ exports.insertArticle = (articleData) => {
     .catch(console.error);
 };
 
-exports.updateArticle = (updateData, article_id) => {
+exports.updateArticle = ({ inc_votes }, article_id) => {
   return knex('articles')
     .where({ article_id })
-    .update(updateData)
-    .returning('*')
-    .catch(console.error);
+    .increment('votes', inc_votes)
+    .returning('*');
 };
 
 exports.deleteArticle = (article_id) => {

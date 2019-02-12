@@ -1,5 +1,5 @@
 const {
-  fetchArticles, fetchArticleByID, insertArticle, updateArticle, deleteArticle,
+  fetchArticles, fetchArticleByID, insertArticle, updateArticle, deleteCommentsByArticleID, deleteArticle,
 } = require('../models');
 
 const { formatArticleData } = require('./utils');
@@ -28,7 +28,7 @@ exports.addArticle = (req, res, next) => {
     .catch(console.error);
 };
 
-exports.putArticle = (req, res, next) => {
+exports.patchArticle = (req, res, next) => {
   updateArticle(req.body, req.params.article_id)
     .then(([article]) => {
       res.status(202).send({ article });
@@ -37,9 +37,12 @@ exports.putArticle = (req, res, next) => {
 };
 
 exports.removeArticle = (req, res, next) => {
-  deleteArticle(req.params.article_id)
+  deleteCommentsByArticleID(req.params.article_id)
     .then(() => {
-      res.send({ msg: `Article ${req.params.article_id} deleted` });
+      return deleteArticle(req.params.article_id);
+    })
+    .then(() => {
+      res.status(204).send();
     })
     .catch(console.error);
 };

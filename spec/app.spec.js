@@ -60,6 +60,7 @@ describe('/api', () => {
           .expect(201)
           .then((res) => {
             expect(res.body.article).to.contain.keys(['article_id', 'title', 'body', 'votes', 'topic', 'author', 'created_at']);
+            expect(res.body.article.body).to.eql('It\'ll be nice if this works.');
           });
       });
     });
@@ -74,15 +75,35 @@ describe('/api', () => {
             expect(result.body.articles).to.contain.keys(['article_id', 'title', 'body', 'votes', 'topic', 'author', 'created_at', 'comment_count']);
           });
       });
-      it('PUT: should respond with ammended article object', () => {
+      it('PATCH: should respond vote incremented article object', () => {
         return request
-          .put('/api/articles/1')
-          .send({ body: 'It\'ll be super nice if this works' })
+          .patch('/api/articles/1')
+          .send({ inc_votes: 1 })
           .expect(202)
           .then((result) => {
             expect(result.body.article.article_id).to.eql(1);
-            expect(result.body.article.body).to.eql('It\'ll be super nice if this works');
+            expect(result.body.article.votes).to.eql(101);
           });
+      });
+      it('PATCH: should respond vote decrement article object', () => {
+        return request
+          .patch('/api/articles/1')
+          .send({ inc_votes: -1 })
+          .expect(202)
+          .then((result) => {
+            expect(result.body.article.article_id).to.eql(1);
+            expect(result.body.article.votes).to.eql(99);
+          });
+      });
+      it('DELETE: should respond with deleted article message', () => {
+        return request
+          .delete('/api/articles/1')
+          .expect(204);
+      });
+    });
+    describe('', () => {
+      it('', () => {
+
       });
     });
   });
