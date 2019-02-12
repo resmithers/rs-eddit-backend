@@ -8,6 +8,5 @@ exports.formatCommentData = (data) => {
   const comments = data.map(({ article_id, ...otherData }) => ({
     ...otherData,
   }));
-
   return { article_id: data[0].article_id, comments };
 };

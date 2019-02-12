@@ -1,14 +1,22 @@
 const knex = require('../db/connection');
 
-exports.fetchArticles = (knexQuery) => {
-  const {
-    limit = 10,
-    page = 1,
-    sort = 'asc',
-    sort_criteria = 'articles.created_at',
-    ...remainingQuery
-  } = knexQuery;
-  const remaining = { ...remainingQuery };
+exports.fetchArticles = ({
+  limit = 10,
+  page = 1,
+  sort = 'desc',
+  sort_criteria = 'articles.created_at',
+  author,
+  body,
+  votes,
+  created_at,
+  ...a
+}) => {
+  const remaining = { ...a };
+  if (author) remaining['articles.author_id'] = author;
+  // if (body) remaining['articles.body'] = body;
+  // if (votes) remaining['articles.votes'] = votes;
+  // if (created_at) remaining['articles.created_at'] = created_at;
+  // console.log(remaining);
 
   return Promise.all([
     knex('articles')

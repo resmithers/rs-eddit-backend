@@ -18,13 +18,28 @@ exports.getCommentsByArticle = (knexQuery, article_id) => {
     .orderBy(sort_criteria, sort);
 };
 
-// knex('comments')
-// .where(remaining)
-// .count({ comment_count: 'comments.comment_id' })
+exports.postCommentByArticle = (article_id, new_comment) => {
+  const { username, body } = new_comment;
+  return knex('comments')
+    .insert({ article_id, author: username, body })
+    .returning('*');
+};
 
+exports.updateComment = ({ inc_votes }, comment_id) => {
+  return knex('comments')
+    .where({ comment_id })
+    .increment('votes', inc_votes)
+    .returning('*');
+};
 
 exports.deleteCommentsByArticleID = (article_id) => {
   return knex('comments')
     .where({ article_id })
+    .delete();
+};
+
+exports.deleteCommentID = (comment_id) => {
+  return knex('comments')
+    .where({ comment_id })
     .delete();
 };
