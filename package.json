@@ -4,7 +4,7 @@
   "description": "## Northcoders News API",
   "main": "index.js",
   "scripts": {
-    "test": "mocha spec --exit",
+    "test": "mocha spec",
     "dev": "nodemon listen.js",
     "lint": "eslint ./",
     "pre-commit": "npm t",

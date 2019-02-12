@@ -1,9 +1,5 @@
-const { sendTopics, addTopic } = require('./topics');
-const {
-  sendArticles, insertArticle, sendArticleByID, putArticle, removeArticle, addArticle,
-} = require('./articles');
+const { ...topicFuncs } = require('./topics');
+const { ...articleFuncs } = require('./articles');
+// const { ...commentFuncs } = require('./comments');
 
-
-module.exports = {
-  sendTopics, addTopic, sendArticles, insertArticle, sendArticleByID, putArticle, removeArticle, addArticle,
-};
+module.exports = { ...topicFuncs, ...articleFuncs };

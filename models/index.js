@@ -1,9 +1,5 @@
-const { fetchTopics, insertTopic } = require('./topics');
-const {
-  fetchArticles, insertArticle, fetchArticleByID, updateArticle, deleteArticle,
-} = require('./articles');
+const { ...topicFuncs } = require('./topics');
+const { ...articleFuncs } = require('./articles');
+const { ...commentFuncs } = require('./comments');
 
-
-module.exports = {
-  fetchTopics, insertTopic, fetchArticles, insertArticle, fetchArticleByID, updateArticle, deleteArticle,
-};
+module.exports = { ...topicFuncs, ...articleFuncs, ...commentFuncs };

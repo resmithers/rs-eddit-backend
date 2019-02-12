@@ -1,17 +1,19 @@
 const {
-  fetchArticles, insertArticle, fetchArticleByID, updateArticle, deleteArticle,
+  fetchArticles, fetchArticleByID, insertArticle, updateArticle, deleteArticle,
 } = require('../models');
 
+const { formatArticleData } = require('./utils');
+
 exports.sendArticles = (req, res, next) => {
-  fetchArticles()
-    .then((articles) => {
-      res.send({ articles });
+  fetchArticles(req.query)
+    .then((data) => {
+      res.send(formatArticleData(data));
     })
     .catch(console.error);
 };
 
 exports.sendArticleByID = (req, res, next) => {
-  fetchArticleByID(req.params.article_id)
+  fetchArticleByID(req.params)
     .then(([articles]) => {
       res.send({ articles });
     })
