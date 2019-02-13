@@ -2,16 +2,17 @@ const knex = require('../db/connection');
 
 exports.fetchArticles = ({
   limit = 10,
-  page = 1,
-  sort = 'desc',
-  sort_criteria = 'articles.created_at',
+  p = 1,
+  order = 'desc',
+  sort_by = 'created_at',
   article_id,
   author,
   ...a
 }) => {
   const remaining = { ...a };
-  if (author) remaining['articles.author_id'] = author;
+  if (author) remaining['articles.author'] = author;
   if (article_id) remaining['articles.article_id'] = article_id;
+  if (sort_by) sort_by = [`articles.${sort_by}`];
 
   return Promise.all([
     knex('articles')
@@ -19,8 +20,8 @@ exports.fetchArticles = ({
       .where(remaining)
       .leftJoin('comments', 'comments.article_id', 'articles.article_id')
       .limit(limit)
-      .offset((page - 1) * limit)
-      .orderBy(sort_criteria, sort)
+      .offset((p - 1) * limit)
+      .orderBy(sort_by, order)
       .groupBy('articles.article_id')
       .count({ comment_count: 'comments.comment_id' }),
     knex('articles')

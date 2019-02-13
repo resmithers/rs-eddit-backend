@@ -3,9 +3,9 @@ const knex = require('../db/connection');
 exports.getCommentsByArticle = (knexQuery, article_id) => {
   const {
     limit = 10,
-    page = 1,
-    sort = 'asc',
-    sort_criteria = 'created_at',
+    p = 1,
+    order = 'asc',
+    sort_by = 'created_at',
     ...remainingQuery
   } = knexQuery;
   const remaining = { article_id, ...remainingQuery };
@@ -14,8 +14,8 @@ exports.getCommentsByArticle = (knexQuery, article_id) => {
     .select('*')
     .where(remaining)
     .limit(limit)
-    .offset((page - 1) * limit)
-    .orderBy(sort_criteria, sort);
+    .offset((p - 1) * limit)
+    .orderBy(sort_by, order);
 };
 
 exports.postCommentByArticle = (article_id, new_comment) => {

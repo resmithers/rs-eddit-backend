@@ -11,7 +11,8 @@ exports.sendUsers = (req, res, next) => {
 exports.addUser = (req, res, next) => {
   insertUser(req.body)
     .then(([user]) => {
-      res.status(201).send({ user });
+      if (!user) return Promise.reject({ status: 404 });
+      return res.status(201).send({ user });
     })
     .catch(next);
 };
@@ -19,7 +20,8 @@ exports.addUser = (req, res, next) => {
 exports.sendUser = (req, res, next) => {
   fetchUserByID(req.params.username)
     .then(([user]) => {
-      res.send({ user });
+      if (!user) return Promise.reject({ status: 404 });
+      return res.send({ user });
     })
     .catch(next);
 };

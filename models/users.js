@@ -7,8 +7,7 @@ exports.fetchUsers = () => {
 exports.insertUser = (userData) => {
   return knex('users')
     .insert(userData)
-    .returning('*')
-    .catch(console.error);
+    .returning('*');
 };
 
 exports.fetchUserByID = (username) => {

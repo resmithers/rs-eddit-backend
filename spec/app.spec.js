@@ -11,7 +11,7 @@ describe('', () => {
   after(() => {
     return connection.destroy();
   });
-  describe('ENDPOINT TESTS', () => {
+  describe('BASIC ENDPOINT TESTS', () => {
     describe('/api', () => {
       it('GET: should respond with JSON describing available endpoints on the API', () => {
         return request.get('/api')
@@ -341,6 +341,99 @@ describe('', () => {
             return request
               .put('/api/comments/118118')
               .expect(405);
+          });
+      });
+    });
+    describe('/users', () => {
+      it('POST:400 and responds with appropriate message', () => {
+        return request
+          .post('/api/users')
+          .send({})
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).to.eql('Violates not null condition');
+          });
+      });
+      it('METHOD:405 and responds with appropriate message', () => {
+        return request
+          .delete('/api/users')
+          .expect(405)
+          .then(() => {
+            return request
+              .put('/api/users')
+              .expect(405);
+          });
+      });
+      describe('/:username', () => {
+        it('GET:404 and responds with appropriate message', () => {
+          return request
+            .get('/api/users/batman')
+            .expect(404)
+            .then(({ body }) => {
+              expect(body.msg).to.eql('Page not found');
+            });
+        });
+        it('METHOD:405 and responds with appropriate message', () => {
+          return request
+            .delete('/api/users/butter_bridge')
+            .expect(405)
+            .then(() => {
+              return request
+                .put('/api/users/butter_bridge')
+                .expect(405);
+            });
+        });
+      });
+    });
+  });
+  describe('QUERY TESTS', () => {
+    describe('/articles', () => {
+      it('GET:QUERY: sort_by, order, limit, p', () => {
+        return request.get('/api/articles?limit=5&p=2&sort_by=article_id')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles[0].article_id).to.eql(7);
+            expect(body.articles[2].article_id).to.eql(5);
+            expect(body.articles[4].article_id).to.eql(3);
+            expect(body.articles).to.have.length(5);
+          });
+      });
+      it('GET:QUERY: author', () => {
+        return request.get('/api/articles?author=butter_bridge&sort_by=article_id')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles[0].article_id).to.eql(12);
+            expect(body.articles[2].article_id).to.eql(1);
+            expect(body.articles).to.have.length(3);
+          });
+      });
+      it('GET:QUERY: topic', () => {
+        return request.get('/api/articles?topic=mitch&sort_by=article_id')
+          .expect(200)
+          .then(({ body }) => {
+            expect(+body.total_articles).to.eql(11);
+            expect(body.articles[0].article_id).to.eql(12);
+            expect(body.articles).to.have.length(10);
+          });
+      });
+    });
+    describe('/articles/:article_id/comments', () => {
+      it('GET:QUERY: sort_by, order', () => {
+        return request.get('/api/articles/1/comments?sort_by=comment_id&order=asc')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.comments.length).to.eql(10);
+            expect(body.comments[0].comment_id).to.eql(2);
+            expect(body.comments[body.comments.length - 1].comment_id).to.eql(11);
+          });
+      });
+      it('GET:QUERY: limit, p, sort_by', () => {
+        return request.get('/api/articles/1/comments?p=1&limit=5&sort_by=comment_id')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.comments.length).to.eql(5);
+            expect(body.comments[0].comment_id).to.eql(2);
+            expect(body.comments[body.comments.length - 1].comment_id).to.eql(6);
           });
       });
     });
