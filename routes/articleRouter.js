@@ -9,19 +9,22 @@ const {
   sendCommentsByArticle,
   addCommentByArticle,
 } = require('../controllers');
+const { handle405 } = require('../errors');
 
 articleRouter.route('/')
   .get(sendArticles)
-  .post(addArticle);
+  .post(addArticle)
+  .all(handle405);
 
 articleRouter.route('/:article_id')
   .get(sendArticleByID)
   .patch(patchArticle)
-  .delete(removeArticle);
+  .delete(removeArticle)
+  .all(handle405);
 
 articleRouter.route('/:article_id/comments')
   .get(sendCommentsByArticle)
   .post(addCommentByArticle)
-  .delete(removeCommentsByArticle);
+  .all(handle405);
 
 module.exports = articleRouter;

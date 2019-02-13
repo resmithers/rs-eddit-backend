@@ -5,7 +5,7 @@ exports.sendUsers = (req, res, next) => {
     .then((users) => {
       res.send({ users });
     })
-    .catch(console.error);
+    .catch(next);
 };
 
 exports.addUser = (req, res, next) => {
@@ -13,7 +13,7 @@ exports.addUser = (req, res, next) => {
     .then(([user]) => {
       res.status(201).send({ user });
     })
-    .catch(console.error);
+    .catch(next);
 };
 
 exports.sendUser = (req, res, next) => {
@@ -21,5 +21,5 @@ exports.sendUser = (req, res, next) => {
     .then(([user]) => {
       res.send({ user });
     })
-    .catch(console.error);
+    .catch(next);
 };

@@ -7,6 +7,5 @@ exports.fetchTopics = () => {
 exports.insertTopic = (topicData) => {
   return knex('topics')
     .insert(topicData)
-    .returning('*')
-    .catch(console.error);
+    .returning('*');
 };

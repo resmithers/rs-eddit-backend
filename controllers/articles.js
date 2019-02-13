@@ -1,23 +1,26 @@
 const {
-  fetchArticles, fetchArticleByID, insertArticle, updateArticle, deleteCommentsByArticleID, deleteArticle,
+  fetchArticles, insertArticle, updateArticle, deleteArticle,
 } = require('../models');
 
 const { formatArticleData } = require('./utils');
 
 exports.sendArticles = (req, res, next) => {
-  fetchArticles(req.query)
+  const varObj = { ...req.query, ...req.params };
+  fetchArticles(varObj)
     .then((data) => {
       res.send(formatArticleData(data));
     })
-    .catch(console.error);
+    .catch(next);
 };
 
 exports.sendArticleByID = (req, res, next) => {
-  fetchArticleByID(req.params)
-    .then(([articles]) => {
-      res.send({ articles });
+  const varObj = { ...req.query, ...req.params };
+  fetchArticles(varObj)
+    .then(([article]) => {
+      if (!article[0]) return Promise.reject({ status: 404 });
+      return res.send({ article: article[0] });
     })
-    .catch(console.error);
+    .catch(next);
 };
 
 exports.addArticle = (req, res, next) => {
@@ -25,24 +28,24 @@ exports.addArticle = (req, res, next) => {
     .then(([article]) => {
       res.status(201).send({ article });
     })
-    .catch(console.error);
+    .catch(next);
 };
 
 exports.patchArticle = (req, res, next) => {
-  updateArticle(req.body, req.params.article_id)
+  // const varObj = { ...req.body, ...req.params };
+  updateArticle(req.body.inc_votes, req.params.article_id)
     .then(([article]) => {
-      res.status(202).send({ article });
+      if (!req.body.inc_votes) return Promise.reject({ status: 400, msg: 'Bad request' });
+      return res.status(202).send({ article });
     })
-    .catch(console.error);
+    .catch(next);
 };
 
 exports.removeArticle = (req, res, next) => {
-  deleteCommentsByArticleID(req.params.article_id)
-    .then(() => {
-      return deleteArticle(req.params.article_id);
+  deleteArticle(req.params.article_id)
+    .then((delRows) => {
+      if (!delRows) return Promise.reject({ status: 404 });
+      return res.status(204).send();
     })
-    .then(() => {
-      res.status(204).send();
-    })
-    .catch(console.error);
+    .catch(next);
 };

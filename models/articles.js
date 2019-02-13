@@ -5,18 +5,13 @@ exports.fetchArticles = ({
   page = 1,
   sort = 'desc',
   sort_criteria = 'articles.created_at',
+  article_id,
   author,
-  body,
-  votes,
-  created_at,
   ...a
 }) => {
   const remaining = { ...a };
   if (author) remaining['articles.author_id'] = author;
-  // if (body) remaining['articles.body'] = body;
-  // if (votes) remaining['articles.votes'] = votes;
-  // if (created_at) remaining['articles.created_at'] = created_at;
-  // console.log(remaining);
+  if (article_id) remaining['articles.article_id'] = article_id;
 
   return Promise.all([
     knex('articles')
@@ -46,11 +41,10 @@ exports.fetchArticleByID = ({ article_id }) => {
 exports.insertArticle = (articleData) => {
   return knex('articles')
     .insert(articleData)
-    .returning('*')
-    .catch(console.error);
+    .returning('*');
 };
 
-exports.updateArticle = ({ inc_votes }, article_id) => {
+exports.updateArticle = (inc_votes, article_id) => {
   return knex('articles')
     .where({ article_id })
     .increment('votes', inc_votes)
@@ -59,7 +53,6 @@ exports.updateArticle = ({ inc_votes }, article_id) => {
 
 exports.deleteArticle = (article_id) => {
   return knex('articles')
-    .where({ article_id })
-    .delete()
-    .catch(console.error);
+    .where('article_id', article_id)
+    .delete();
 };

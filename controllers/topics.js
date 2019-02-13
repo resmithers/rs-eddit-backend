@@ -5,7 +5,7 @@ exports.sendTopics = (req, res, next) => {
     .then((topics) => {
       res.send({ topics });
     })
-    .catch(console.error);
+    .catch(next);
 };
 
 exports.addTopic = (req, res, next) => {
@@ -13,5 +13,5 @@ exports.addTopic = (req, res, next) => {
     .then(([topic]) => {
       res.status(201).send({ topic });
     })
-    .catch(console.error);
+    .catch(next);
 };

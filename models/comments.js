@@ -32,12 +32,6 @@ exports.updateComment = ({ inc_votes }, comment_id) => {
     .returning('*');
 };
 
-exports.deleteCommentsByArticleID = (article_id) => {
-  return knex('comments')
-    .where({ article_id })
-    .delete();
-};
-
 exports.deleteCommentID = (comment_id) => {
   return knex('comments')
     .where({ comment_id })
