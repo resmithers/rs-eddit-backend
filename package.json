@@ -4,6 +4,7 @@
   "description": "## Northcoders News API",
   "main": "index.js",
   "scripts": {
+    "start": "node listen.js",
     "test": "mocha spec",
     "dev": "nodemon listen.js",
     "lint": "eslint ./",
