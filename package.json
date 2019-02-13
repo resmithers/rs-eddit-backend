@@ -8,7 +8,6 @@
     "dev": "nodemon listen.js",
     "lint": "eslint ./",
     "pre-commit": "npm t",
-    "posttest": "npm run lint",
     "setup-dbs": "psql -f db/setup.sql",
     "migrate:make": "knex migrate:make",
     "migrate:rollback": "knex migrate:rollback",

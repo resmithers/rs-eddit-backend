@@ -11,6 +11,14 @@ describe('/api', () => {
   after(() => {
     return connection.destroy();
   });
+  it('GET: should respond with JSON describing available endpoints on the API', () => {
+    return request.get('/api')
+      .expect(200)
+      .then(({ body }) => {
+        expect(body).to.be.an('object');
+        expect(body.api['/topics']).to.contain.keys('GET', 'POST');
+      });
+  });
   describe('/topics', () => {
     it('GET: should respond with array of all topics, with correct length and keys', () => {
       return request.get('/api/topics')
@@ -155,7 +163,7 @@ describe('/api', () => {
     });
   });
   describe('/users', () => {
-    it('GET', () => {
+    it('GET: should respond with all user records, as array of objects', () => {
       return request.get('/api/users')
         .expect(200)
         .then(({ body }) => {
@@ -164,18 +172,28 @@ describe('/api', () => {
           expect(body.users).to.have.length(3);
         });
     });
-    it('POST', () => {
-
+    it('POST: should add user to db, respond with 201 and the user data', () => {
+      const newUser = {
+        username: 'PrincessConsuelaBananaHammock',
+        name: 'phoebe',
+        avatar_url: 'https://avatars2.githubusercontent.com/u/24604688?s=460&v=4',
+      };
+      return request.post('/api/users')
+        .send(newUser)
+        .expect(201)
+        .then(({ body }) => {
+          expect(body.user.username).to.eql(newUser.username);
+          expect(body.user.name).to.eql(newUser.name);
+        });
     });
     describe('/:username', () => {
-      it('GET', () => {
+      it('GET: should respond with relevant user object, based on request username', () => {
         return request.get('/api/users/butter_bridge')
           .expect(200)
           .then(({ body }) => {
-            console.log(body);
-            expect(body.user).to.be.an('array');
-            expect(body.user).to.have.length(1);
-            expect(body.user[0].username).to.eql('butter_bridge');
+            expect(body.user).to.be.an('object');
+            expect(body.user.username).to.eql('butter_bridge');
+            expect(body.user.name).to.eql('jonny');
           });
       });
     });
