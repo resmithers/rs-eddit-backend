@@ -16,9 +16,10 @@ describe('', () => {
       it('GET: should respond with JSON describing available endpoints on the API', () => {
         return request.get('/api')
           .expect(200)
-          .then(({ body }) => {
-            expect(body).to.be.an('object');
-            expect(body.api['/topics']).to.contain.keys('GET', 'POST');
+          .then(({ text }) => {
+            console.log(text);
+            expect(text).to.be.an('object');
+            expect(text.api['/topics']).to.contain.keys('GET', 'POST');
           });
       });
       describe('/topics', () => {
@@ -210,6 +211,19 @@ describe('', () => {
         });
     });
     describe('/api/topics', () => {
+      it('POST:422 and responds with appropriate message', () => {
+        const newTopic = {
+          slug: 'mitch',
+          description: 'The man, the Mitch, the legend',
+        };
+        return request
+          .post('/api/topics')
+          .send(newTopic)
+          .expect(422)
+          .then(({ body }) => {
+            expect(body.msg).to.eql('Duplicate key violates unique constraint');
+          });
+      });
       it('POST:400 and responds with appropriate message', () => {
         const newTopic = {
           slug: 'Elephants',
@@ -312,6 +326,16 @@ describe('', () => {
                 expect(body.msg).to.eql('Violates not null condition');
               });
           });
+          it('METHOD:405 and responds with appropriate message', () => {
+            return request
+              .delete('/api/articles/118118/comments')
+              .expect(405)
+              .then(() => {
+                return request
+                  .put('/api/articles/118118/comments')
+                  .expect(405);
+              });
+          });
         });
       });
     });
@@ -353,6 +377,17 @@ describe('', () => {
           .then(({ body }) => {
             expect(body.msg).to.eql('Violates not null condition');
           });
+      }); it('POST:422 and responds with appropriate message', () => {
+        return request
+          .post('/api/users')
+          .send({ username: 'butter_bridge',
+            name: 'jonny',
+            avatar_url: 'https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg',
+          })
+          .expect(422)
+          .then(({ body }) => {
+            expect(body.msg).to.eql('Duplicate key violates unique constraint');
+          });
       });
       it('METHOD:405 and responds with appropriate message', () => {
         return request
@@ -388,7 +423,7 @@ describe('', () => {
   });
   describe('QUERY TESTS', () => {
     describe('/articles', () => {
-      it('GET:QUERY: sort_by, order, limit, p', () => {
+      it('GET: QUERY: sort_by, order, limit, p', () => {
         return request.get('/api/articles?limit=5&p=2&sort_by=article_id')
           .expect(200)
           .then(({ body }) => {
@@ -398,7 +433,7 @@ describe('', () => {
             expect(body.articles).to.have.length(5);
           });
       });
-      it('GET:QUERY: author', () => {
+      it('GET: QUERY: author, sort_by', () => {
         return request.get('/api/articles?author=butter_bridge&sort_by=article_id')
           .expect(200)
           .then(({ body }) => {
@@ -407,7 +442,7 @@ describe('', () => {
             expect(body.articles).to.have.length(3);
           });
       });
-      it('GET:QUERY: topic', () => {
+      it('GET: QUERY: topic, sort_by', () => {
         return request.get('/api/articles?topic=mitch&sort_by=article_id')
           .expect(200)
           .then(({ body }) => {
@@ -418,7 +453,7 @@ describe('', () => {
       });
     });
     describe('/articles/:article_id/comments', () => {
-      it('GET:QUERY: sort_by, order', () => {
+      it('GET: QUERY: sort_by, order', () => {
         return request.get('/api/articles/1/comments?sort_by=comment_id&order=asc')
           .expect(200)
           .then(({ body }) => {
@@ -427,7 +462,7 @@ describe('', () => {
             expect(body.comments[body.comments.length - 1].comment_id).to.eql(11);
           });
       });
-      it('GET:QUERY: limit, p, sort_by', () => {
+      it('GET: QUERY: limit, p, sort_by', () => {
         return request.get('/api/articles/1/comments?p=1&limit=5&sort_by=comment_id')
           .expect(200)
           .then(({ body }) => {

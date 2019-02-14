@@ -1,3 +1,5 @@
+const fs = require('fs');
+
 exports.formatArticleData = (data) => {
   const articles = data[0];
   const { total_articles } = data[1][0];
@@ -12,37 +14,11 @@ exports.formatCommentData = (data) => {
 };
 
 exports.serveEndpoints = (req, res, next) => {
-  const endJSON = {
-    api: {
-      '/topics': {
-        GET: 'responds with all topics in the database',
-        POST: 'takes JSON with unique slug, and description, adds topic to the database, and responds with the new record',
-      },
-      '/articles': {
-        GET: 'responds with all articles in the database, taking queries for author, topic, sort by, order(asc, desc), limit(results per page) and page',
-        POST: 'takes JSON with title, body, topic(referencing topic db) and username(referencing user db), adds article to the database, and responds with the new record',
-        '/:article_id': {
-          GET: 'responds with single article, based on article_id from parametric url',
-          PATCH: 'increments vote count, on single article based on article_id from parametric url, taking an object with {inc_vote: desired increment} and responding with the updated record',
-          DELETE: 'deletes selected article, and associated comments, based on article_id',
-          '/comments': {
-            GET: 'responds with all comments referencing given article_id',
-            POST: 'takes JSON with username and body, adds comment to database, and responds with the new record',
-          },
-        },
-      },
-      '/comments': {
-        PATCH: 'increments vote count, on single article based on comment_id from parametric url, taking an object with {inc_vote: desired increment} and responding with the updated record',
-        DELETE: 'deletes selected comment, based on comment_id',
-      },
-      '/users': {
-        GET: 'responds with all users in the database',
-        POST: 'takes JSON with username, avatar_url and name, adds user to the database, and responds with the new record',
-        '/:username': {
-          GET: 'responds with single user, based on username from parametric url',
-        },
-      },
-    },
-  };
-  res.send(endJSON);
+  fs.readFile('./api.json', 'utf8', (err, data) => {
+    if (err) next(err);
+    else {
+      // console.log(data);
+      res.send(JSON.parse(data));
+    }
+  });
 };
