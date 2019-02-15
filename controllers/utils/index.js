@@ -17,7 +17,6 @@ exports.serveEndpoints = (req, res, next) => {
   fs.readFile('./api.json', 'utf8', (err, data) => {
     if (err) next(err);
     else {
-      // console.log(data);
       res.send(JSON.parse(data));
     }
   });

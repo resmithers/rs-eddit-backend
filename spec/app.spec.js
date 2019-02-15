@@ -17,9 +17,8 @@ describe('', () => {
         return request.get('/api')
           .expect(200)
           .then(({ text }) => {
-            console.log(text);
-            expect(text).to.be.an('object');
-            expect(text.api['/topics']).to.contain.keys('GET', 'POST');
+            expect(text).to.be.a('string');
+            // expect(text.api['/topics']).to.contain.keys('GET', 'POST');
           });
       });
       describe('/topics', () => {
@@ -87,7 +86,7 @@ describe('', () => {
             return request
               .patch('/api/articles/1')
               .send({ inc_votes: 1 })
-              .expect(202)
+              .expect(200)
               .then((result) => {
                 expect(result.body.article.article_id).to.eql(1);
                 expect(result.body.article.votes).to.eql(101);
@@ -97,7 +96,7 @@ describe('', () => {
             return request
               .patch('/api/articles/1')
               .send({ inc_votes: -1 })
-              .expect(202)
+              .expect(200)
               .then((result) => {
                 expect(result.body.article.article_id).to.eql(1);
                 expect(result.body.article.votes).to.eql(99);
@@ -109,15 +108,15 @@ describe('', () => {
               .expect(204);
           });
         });
-        describe('/api/articles/:article_id/comments', () => {
+        describe('/comments', () => {
           it('GET should respond with comment object, based on article ID', () => {
             return request.get('/api/articles/1/comments')
               .expect(200)
               .then(({ body }) => {
                 expect(body.comments).to.be.an('array');
                 expect(body.comments[0]).to.contain.keys(['comment_id', 'body', 'votes', 'author', 'created_at']);
-                expect(body.comments[0].comment_id).to.eql(18);
-                expect(body.comments[0].body).to.eql('This morning, I showered for nine minutes.');
+                expect(body.comments[0].comment_id).to.eql(2);
+                expect(body.comments[0].body).to.eql('The beautiful thing about treasure is that it exists. Got to find out what kind of sheets these are; not cotton, not rayon, silky.');
               });
           });
           it('POST: should add comment to db, respond 201 and new comment data', () => {
@@ -142,7 +141,7 @@ describe('', () => {
           return request
             .patch('/api/comments/1')
             .send({ inc_votes: 1 })
-            .expect(202)
+            .expect(200)
             .then(({ body }) => {
               expect(body.comment.comment_id).to.eql(1);
               expect(body.comment.votes).to.eql(17);
@@ -152,7 +151,7 @@ describe('', () => {
           return request
             .patch('/api/comments/1')
             .send({ inc_votes: -1 })
-            .expect(202)
+            .expect(200)
             .then(({ body }) => {
               expect(body.comment.comment_id).to.eql(1);
               expect(body.comment.votes).to.eql(15);
@@ -221,7 +220,7 @@ describe('', () => {
           .send(newTopic)
           .expect(422)
           .then(({ body }) => {
-            expect(body.msg).to.eql('Duplicate key violates unique constraint');
+            expect(body.msg).to.eql('Key (slug)=(mitch) already exists.');
           });
       });
       it('POST:400 and responds with appropriate message', () => {
@@ -262,6 +261,36 @@ describe('', () => {
             expect(body.msg).to.eql('Violates not null condition');
           });
       });
+      it('POST:400 and responds with appropriate message', () => {
+        const newArticle = {
+          title: 'hiya',
+          topic: 'bananas',
+          author: 'butter_bridge',
+          body: 'It\'ll be nice if this works.',
+        };
+        return request
+          .post('/api/articles')
+          .send(newArticle)
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).to.eql('Bad request');
+          });
+      });
+      it('POST:400 and responds with appropriate message', () => {
+        const newArticle = {
+          title: 'hiya',
+          topic: 'mitch',
+          author: 'PrincessConsuela',
+          body: 'It\'ll be nice if this works.',
+        };
+        return request
+          .post('/api/articles')
+          .send(newArticle)
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).to.eql('Bad request');
+          });
+      });
       it('METHOD:405 and responds with appropriate message', () => {
         return request
           .delete('/api/articles')
@@ -273,12 +302,12 @@ describe('', () => {
           });
       });
       describe('/:article_id', () => {
-        it('GET:404 and responds with appropriate message', () => {
+        it('GET:400 and responds with appropriate message', () => {
           return request
             .get('/api/articles/118118')
-            .expect(404)
+            .expect(400)
             .then(({ body }) => {
-              expect(body.msg).to.eql('Page not found');
+              expect(body.msg).to.eql('Bad request');
             });
         });
         it('PATCH:400 and responds with appropriate message', () => {
@@ -290,12 +319,29 @@ describe('', () => {
               expect(body.msg).to.eql('Bad request');
             });
         });
+        it('PATCH:400 no req.body, and responds with appropriate message', () => {
+          return request
+            .patch('/api/articles/1')
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.article.article_id).to.eql(1);
+            });
+        });
+        it('PATCH:400 bad vote type, and responds with appropriate message', () => {
+          return request
+            .patch('/api/articles/1')
+            .send({ inc_votes: 'Balloons' })
+            .expect(400)
+            .then(({ body }) => {
+              expect(body.msg).to.eql('Bad request');
+            });
+        });
         it('DELETE:404 and responds with appropriate message', () => {
           return request
             .delete('/api/articles/118118')
-            .expect(404)
+            .expect(400)
             .then(({ body }) => {
-              expect(body.msg).to.eql('Page not found');
+              expect(body.msg).to.eql('Bad request');
             });
         });
         it('METHOD:405 and responds with appropriate message', () => {
@@ -317,13 +363,39 @@ describe('', () => {
                 expect(body.msg).to.eql('Page not found');
               });
           });
-          it('POST:400 and responds with appropriate message', () => {
+          it('GET:400 and responds with appropriate message', () => {
             return request
-              .post('/api/articles/118118/comments')
-              .send({})
+              .get('/api/articles/sasquatch/comments')
               .expect(400)
               .then(({ body }) => {
-                expect(body.msg).to.eql('Violates not null condition');
+                expect(body.msg).to.eql('Bad request, invalid primary key');
+              });
+          });
+          it('POST:404 article_id not in range responds with appropriate message', () => {
+            return request
+              .post('/api/articles/118118/comments')
+              .send({ username: 'butter_bridge', body: 'I think your article is awful' })
+              .expect(404)
+              .then(({ body }) => {
+                expect(body.msg).to.eql('Page not found');
+              });
+          });
+          it('POST:400 invalid article_id responds with appropriate message', () => {
+            return request
+              .post('/api/articles/sasquatch/comments')
+              .send({ username: 'butter_bridge', body: 'I think your article is awful' })
+              .expect(400)
+              .then(({ body }) => {
+                expect(body.msg).to.eql('Bad request, invalid primary key');
+              });
+          });
+          it('POST:400 invalid username in req.body responds with appropriate message', () => {
+            return request
+              .post('/api/articles/1/comments')
+              .send({ username: 'PrincessConsuela', body: 'I think your article is awful' })
+              .expect(422)
+              .then(({ body }) => {
+                expect(body.msg).to.eql('Key (author)=(PrincessConsuela) is not present in table "users".');
               });
           });
           it('METHOD:405 and responds with appropriate message', () => {
@@ -340,10 +412,37 @@ describe('', () => {
       });
     });
     describe('/comments/:comment_id', () => {
-      it('PATCH:400 and responds with appropriate message', () => {
+      it('PATCH:404 non existent comment responds with appropriate message', () => {
         return request
           .patch('/api/comments/118118')
           .send({})
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).to.eql('Page not found');
+          });
+      });
+      it('PATCH:404 non existent comment responds with appropriate message', () => {
+        return request
+          .patch('/api/comments/118118')
+          .send({ inc_votes: 'banana' })
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).to.eql('Page not found');
+          });
+      });
+      it('PATCH: no body, ignores and responds with comment object', () => {
+        return request
+          .patch('/api/comments/1')
+          .send({})
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.comment.comment_id).to.eql(1);
+          });
+      });
+      it('PATCH:400 inc_votes NaN responds with appropriate message', () => {
+        return request
+          .patch('/api/comments/1')
+          .send({ inc_votes: 'banana' })
           .expect(400)
           .then(({ body }) => {
             expect(body.msg).to.eql('Bad request');
@@ -352,9 +451,9 @@ describe('', () => {
       it('DELETE:400 and responds with appropriate message', () => {
         return request
           .delete('/api/comments/118118')
-          .expect(404)
+          .expect(400)
           .then(({ body }) => {
-            expect(body.msg).to.eql('Page not found');
+            expect(body.msg).to.eql('Bad request');
           });
       });
       it('METHOD:405 and responds with appropriate message', () => {
@@ -386,7 +485,7 @@ describe('', () => {
           })
           .expect(422)
           .then(({ body }) => {
-            expect(body.msg).to.eql('Duplicate key violates unique constraint');
+            expect(body.msg).to.eql('Key (username)=(butter_bridge) already exists.');
           });
       });
       it('METHOD:405 and responds with appropriate message', () => {
@@ -451,6 +550,23 @@ describe('', () => {
             expect(body.articles).to.have.length(10);
           });
       });
+      it('GET: BADQUERY: topic = banana', () => {
+        return request.get('/api/articles?topic=banana')
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).to.equal('Page not found');
+          });
+      });
+      it('GET: BADQUERY: banana = banana', () => {
+        return request.get('/api/articles?banana=banana')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles).to.be.an('array');
+            expect(body.articles).to.have.length(10);
+            expect(+body.total_articles).to.eql(12);
+            expect(body.articles[0]).to.contain.keys(['article_id', 'title', 'body', 'votes', 'topic', 'author', 'created_at', 'comment_count']);
+          });
+      });
     });
     describe('/articles/:article_id/comments', () => {
       it('GET: QUERY: sort_by, order', () => {
@@ -462,8 +578,16 @@ describe('', () => {
             expect(body.comments[body.comments.length - 1].comment_id).to.eql(11);
           });
       });
-      it('GET: QUERY: limit, p, sort_by', () => {
-        return request.get('/api/articles/1/comments?p=1&limit=5&sort_by=comment_id')
+      it('GET: BADQUERY: sort_by - should ignore bad sort query, and return data irrespective', () => {
+        return request.get('/api/articles/1/comments?sort_by=elephant')
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.comments[0]).to.have.keys('author', 'body', 'comment_id', 'created_at', 'votes');
+            expect(body.comments[0].comment_id).to.eql(2);
+          });
+      });
+      it('GET: QUERY: limit, p, sort_by, order', () => {
+        return request.get('/api/articles/1/comments?p=1&limit=5&sort_by=comment_id&order=asc')
           .expect(200)
           .then(({ body }) => {
             expect(body.comments.length).to.eql(5);

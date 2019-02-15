@@ -4,7 +4,7 @@ exports.getCommentsByArticle = (knexQuery, article_id) => {
   const {
     limit = 10,
     p = 1,
-    order = 'asc',
+    order = 'desc',
     sort_by = 'created_at',
     ...remainingQuery
   } = knexQuery;
