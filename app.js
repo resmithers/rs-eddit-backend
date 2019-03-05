@@ -1,15 +1,12 @@
 const app = require('express')();
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const apiRouter = require('./routes/apiRouter');
 const { handle400, handle500, validateQuery } = require('./errors');
 
 app.use(bodyParser.json());
 app.use(validateQuery);
-
-app.get('/*', (req, res, next) => {
-  res.set('Access-Control-Allow-Origin', '*');
-  next();
-});
+app.use(cors());
 
 app.use('/api', apiRouter);
 
