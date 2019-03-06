@@ -19,9 +19,9 @@ exports.getCommentsByArticle = (knexQuery, article_id) => {
 };
 
 exports.postCommentByArticle = (article_id, new_comment) => {
-  const { username, body } = new_comment;
+  const { author, body } = new_comment;
   return knex('comments')
-    .insert({ article_id, author: username, body })
+    .insert({ article_id, author, body })
     .returning('*');
 };
 
