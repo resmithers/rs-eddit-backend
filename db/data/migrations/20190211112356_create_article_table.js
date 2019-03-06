@@ -8,7 +8,7 @@ exports.up = function (knex, Promise) {
     articleTable.integer('votes').defaultTo(0);
     articleTable.string('topic').references('topics.slug');
     articleTable.string('author').references('users.username');
-    articleTable.datetime('created_at').defaultTo(new Date().toISOString());
+    articleTable.datetime('created_at').defaultTo(knex.fn.now());
   });
 };
 
