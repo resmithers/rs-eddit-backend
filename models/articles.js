@@ -19,11 +19,11 @@ exports.fetchArticles = ({
       .select('articles.*')
       .where(remaining)
       .leftJoin('comments', 'comments.article_id', 'articles.article_id')
+      .count({ comment_count: 'comments.comment_id' })
       .limit(limit)
       .offset((p - 1) * limit)
-      .orderBy(sort_by, order)
       .groupBy('articles.article_id')
-      .count({ comment_count: 'comments.comment_id' }),
+      .orderBy(sort_by, order),
     knex('articles')
       .where(remaining)
       .count({ total_articles: 'articles.article_id' })]);
