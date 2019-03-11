@@ -12,7 +12,7 @@ exports.fetchArticles = ({
   const remaining = { ...a };
   if (author) remaining['articles.author'] = author;
   if (article_id) remaining['articles.article_id'] = article_id;
-  if (sort_by) sort_by = [`articles.${sort_by}`];
+  if (sort_by) sort_by = [sort_by === 'comment_count' ? sort_by : `articles.${sort_by}`];
 
   return Promise.all([
     knex('articles')
@@ -20,10 +20,10 @@ exports.fetchArticles = ({
       .where(remaining)
       .leftJoin('comments', 'comments.article_id', 'articles.article_id')
       .count({ comment_count: 'comments.comment_id' })
-      .limit(limit)
-      .offset((p - 1) * limit)
       .groupBy('articles.article_id')
-      .orderBy(sort_by, order),
+      .orderBy(sort_by, order)
+      .offset((p - 1) * limit)
+      .limit(limit),
     knex('articles')
       .where(remaining)
       .count({ total_articles: 'articles.article_id' })]);

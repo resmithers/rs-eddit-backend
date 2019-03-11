@@ -6,6 +6,7 @@ const { formatArticleData } = require('./utils');
 
 exports.sendArticles = (req, res, next) => {
   const varObj = { ...req.query, ...req.params };
+  console.log(req.query);
   fetchArticles(varObj)
     .then((data) => {
       if (!data[0][0]) return Promise.reject({ status: 404 });
