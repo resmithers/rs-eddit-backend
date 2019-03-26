@@ -85,12 +85,11 @@ Prior to each test run, the database is re-seeded to ensure reliability of data.
 
 ## Authors
 
-* **northcoders** - *Initial work* - [northcoders](https://github.com/northcoders)
 * **Rory Smith** - *Initial work* - [resmithers](https://github.com/resmithers)
 
 ## License
 
-This project is licensed by me, for me, to me (ie there's no formal licensing)
+This project is licensed by me, for me, to me (i.e. there's no formal licensing)
 
 ## Acknowledgments
 
